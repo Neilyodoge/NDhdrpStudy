@@ -38,11 +38,11 @@ Shader "FullScreen/FS_SharpenFilter"
     // 类拉普拉斯卷积核,参考 https://zhuanlan.zhihu.com/p/511643260
     float3 sharpenFilter(float2 fragCoord)
     {
-        float3 f =  CustomPassLoadCameraColor(fragCoord + float2(0, -1),0).rgb * -1. +
-                    CustomPassLoadCameraColor(fragCoord + float2(-1, 0),0).rgb * -1. +
-                    CustomPassLoadCameraColor(fragCoord + float2(0, 0),0).rgb  * 5.  +
-                    CustomPassLoadCameraColor(fragCoord + float2(1, 0),0).rgb * -1.  +
-                    CustomPassLoadCameraColor(fragCoord + float2(0, 1),0).rgb * -1.  ;
+        float3 f =  CustomPassLoadCustomColor(fragCoord + float2(0, -1)).rgb * -1. +
+                    CustomPassLoadCustomColor(fragCoord + float2(-1, 0)).rgb * -1. +
+                    CustomPassLoadCustomColor(fragCoord + float2(0, 0)).rgb  * 5.  +
+                    CustomPassLoadCustomColor(fragCoord + float2(1, 0)).rgb * -1.  +
+                    CustomPassLoadCustomColor(fragCoord + float2(0, 1)).rgb * -1.  ;
 
         return f;
     }
@@ -55,8 +55,8 @@ Shader "FullScreen/FS_SharpenFilter"
         float4 color = float4(0.0, 0.0, 0.0, 0.0);
 
         // Load the camera color buffer at the mip 0 if we're not at the before rendering injection point
-        if (_CustomPassInjectionPoint != CUSTOMPASSINJECTIONPOINT_BEFORE_RENDERING)
-            color = float4(CustomPassLoadCameraColor(varyings.positionCS.xy, 0), 1);
+        // if (_CustomPassInjectionPoint != CUSTOMPASSINJECTIONPOINT_BEFORE_RENDERING)
+        //     color = float4(CustomPassLoadCustomColor(varyings.positionCS.xy), 1);
 
         // Add your custom pass code here
         // 这里没* _RTHandleScale.xy,计算后有错误

@@ -50,14 +50,14 @@ Shader "FullScreen/FS_SNNFilter"
     {
         float2 uv = fragCoord;
         
-        float3 c0 = CustomPassLoadCameraColor(uv, 0);
+        float3 c0 = CustomPassSampleCustomColor(uv);
         
         float4 sum = float4(0.0f, 0.0f, 0.0f, 0.0f);
         
         for (int i = 0; i <= _HalfWidth; ++ i)
         {
-            float3 c1 = CustomPassLoadCameraColor(uv + float2(+i, 0) ,0).rgb;
-            float3 c2 = CustomPassLoadCameraColor(uv + float2(-i, 0) ,0).rgb;
+            float3 c1 = CustomPassSampleCustomColor(uv + float2(+i, 0)).rgb;
+            float3 c2 = CustomPassSampleCustomColor(uv + float2(-i, 0)).rgb;
             
             float d1 = CalcDistance(c1, c0);
             float d2 = CalcDistance(c2, c0);
@@ -76,8 +76,8 @@ Shader "FullScreen/FS_SNNFilter"
             for (int i = -_HalfWidth; i <= _HalfWidth; ++ i)
             {
                 // float3 c1 = SAMPLE_TEXTURE2D(_MainTex, sampler_MainTex, uv + float2(+i, +j) * _ScreenSize.zw).rgb;
-                float3 c1 = CustomPassLoadCameraColor(uv + float2(+i, +j) ,0).rgb;
-                float3 c2 = CustomPassLoadCameraColor(uv + float2(-i, -j) ,0).rgb;
+                float3 c1 = CustomPassSampleCustomColor(uv + float2(+i, +j)).rgb;
+                float3 c2 = CustomPassSampleCustomColor(uv + float2(-i, -j)).rgb;
                 
                 float d1 = CalcDistance(c1, c0);
                 float d2 = CalcDistance(c2, c0);
@@ -103,8 +103,8 @@ Shader "FullScreen/FS_SNNFilter"
         float4 color = float4(0.0, 0.0, 0.0, 0.0);
 
         // Load the camera color buffer at the mip 0 if we're not at the before rendering injection point
-        if (_CustomPassInjectionPoint != CUSTOMPASSINJECTIONPOINT_BEFORE_RENDERING)
-            color = float4(CustomPassLoadCameraColor(varyings.positionCS.xy, 0), 1);
+        // if (_CustomPassInjectionPoint != CUSTOMPASSINJECTIONPOINT_BEFORE_RENDERING)
+        //     color = float4(CustomPassSampleCustomColor(varyings.positionCS.xy, 0), 1);
 
         // Add your custom pass code here
         float3 SNNFilterResult = CalcSNN(varyings.positionCS.xy);
