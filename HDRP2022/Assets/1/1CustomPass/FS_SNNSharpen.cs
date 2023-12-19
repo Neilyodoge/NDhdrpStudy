@@ -89,7 +89,7 @@ class FS_SNNSharpen : CustomPass
         // Setup code here
         tempBuffer = RTHandles.Alloc(Vector2.one, TextureXR.slices, dimension: TextureXR.dimension, colorFormat: GraphicsFormat.R16G16B16A16_SFloat, useDynamicScale: true, name: "Temp Buffer");
 
-        targetColorBuffer = TargetBuffer.Camera ;
+        targetColorBuffer = TargetBuffer.Camera;
         //targetDepthBuffer = TargetBuffer.Custom;
         //clearFlags = ClearFlag.All;
     }
@@ -104,6 +104,9 @@ class FS_SNNSharpen : CustomPass
         SNN_mat.SetFloat("_SNNIntensity", _SNNIntensity);
         SNN_mat.SetFloat("_SNNHalfWidth", _SNNHalfWidth);
         Sharpen_mat.SetFloat("_SharpIntensity", _SharpIntensity);
+
+        ctx.cmd.Blit(ctx.cameraColorBuffer, tempBuffer, SNN_mat, 0);
+        Sharpen_mat.SetTexture("_AfterSNNTex", tempBuffer);
 #if UNITY_EDITOR
         if (debug == 1)
         {
@@ -115,10 +118,15 @@ class FS_SNNSharpen : CustomPass
             CoreUtils.DrawFullScreen(ctx.cmd, Sharpen_mat, ctx.cameraColorBuffer, properties: ctx.propertyBlock);
         }
 #endif
-        ctx.cmd.Blit(ctx.cameraColorBuffer, tempBuffer, SNN_mat, 0);
-        Sharpen_mat.SetTexture("_AfterSNNTex", tempBuffer);
-        CoreUtils.DrawFullScreen(ctx.cmd, Sharpen_mat, ctx.cameraColorBuffer, properties: ctx.propertyBlock);
-    }
+#if UNITY_EDITOR
+        if (debug == 0)
+        {
+#endif
+            CoreUtils.DrawFullScreen(ctx.cmd, Sharpen_mat, ctx.cameraColorBuffer, properties: ctx.propertyBlock);
+#if UNITY_EDITOR
+        }
+#endif
+            }
 
     protected override void Cleanup()
     {

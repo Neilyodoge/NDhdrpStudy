@@ -1,5 +1,10 @@
-Shader "FullScreen/FS_SharpenFilter"
+Shader "FullScreen/FullScreen_Red"
 {
+    Properties
+    {
+        _Color ("color",color) = (1,1,1,1)
+        _SNNTex("SNNTex",2D) = "white"
+    }
     HLSLINCLUDE
 
     #pragma vertex Vert
@@ -30,19 +35,8 @@ Shader "FullScreen/FS_SharpenFilter"
 
     // There are also a lot of utility function you can use inside Common.hlsl and Color.hlsl,
     // you can check them out in the source code of the core SRP package.
-    TEXTURE2D(_AfterSNNTex);
-    float3 sharpenFilter(float2 fragCoord)
-    {
-        float3 f =  SAMPLE_TEXTURE2D(_AfterSNNTex,s_linear_repeat_sampler,fragCoord + float2(0, -1)).rgb * -1. +
-                    SAMPLE_TEXTURE2D(_AfterSNNTex,s_linear_repeat_sampler,fragCoord + float2(-1, 0)).rgb * -1. +
-                    SAMPLE_TEXTURE2D(_AfterSNNTex,s_linear_repeat_sampler,fragCoord + float2(0, 0)).rgb  * 5.  +
-                    SAMPLE_TEXTURE2D(_AfterSNNTex,s_linear_repeat_sampler,fragCoord + float2(1, 0)).rgb * -1.  +
-                    SAMPLE_TEXTURE2D(_AfterSNNTex,s_linear_repeat_sampler,fragCoord + float2(0, 1)).rgb * -1.  ;
-
-        return f;
-    }
-
-    
+    float4 _Color;
+    TEXTURE2D(_SNNTex);
 
     float4 FullScreenPass(Varyings varyings) : SV_Target
     {
@@ -57,12 +51,10 @@ Shader "FullScreen/FS_SharpenFilter"
             color = float4(CustomPassLoadCameraColor(varyings.positionCS.xy, 0), 1);
 
         // Add your custom pass code here
-        varyings.positionCS.y *= -1;
-        //color.rgb = sharpenFilter(varyings.positionCS.xy * _ScreenSize.zw * _RTHandleScale.xy);
-        color.rgb = SAMPLE_TEXTURE2D(_AfterSNNTex,s_linear_clamp_sampler,varyings.positionCS.xy  ).rgb;
         // Fade value allow you to increase the strength of the effect while the camera gets closer to the custom pass volume
+        color.rgb = SAMPLE_TEXTURE2D(_SNNTex,s_linear_clamp_sampler,varyings.positionCS.xy * _ScreenSize.zw * _RTHandleScale.xy).rgb;//
         float f = 1 - abs(_FadeValue * 2 - 1);
-        return float4(color.rgb + f, color.a);
+        return float4(color.rgb * _Color.rgb + f, color.a);
     }
 
     ENDHLSL
