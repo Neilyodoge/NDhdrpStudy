@@ -2,8 +2,8 @@ Shader "FullScreen/FS_SNNFilter"
 {
     Properties
     {
-        _LerpBase("LerpBase",range(0,1)) = 0
-        _HalfWidth ("Sampler Count", range(-1,20)) = 5
+        _SNNIntensity("LerpBase",range(0,1)) = 0
+        _SNNHalfWidth ("Sampler Count", range(-1,20)) = 5
     }
     HLSLINCLUDE
 
@@ -28,15 +28,15 @@ Shader "FullScreen/FS_SNNFilter"
     // To sample custom buffers, you have access to these functions:
     // But be careful, on most platforms you can't sample to the bound color buffer. It means that you
     // can't use the SampleCustomColor when the pass color buffer is set to custom (and same for camera the buffer).
-    // float4 CustomPassSampleCustomColor(float2 uv);
+    // float4 CustomPassLoadCameraColor(float2 uv);
     // float4 CustomPassLoadCustomColor(uint2 pixelCoords);
     // float LoadCustomDepth(uint2 pixelCoords);
     // float SampleCustomDepth(float2 uv);
 
     // There are also a lot of utility function you can use inside Common.hlsl and Color.hlsl,
     // you can check them out in the source code of the core SRP package.
-    float _HalfWidth;
-    float _LerpBase;
+    float _SNNHalfWidth;
+    float _SNNIntensity;
     //Copy from https://www.shadertoy.com/view/MlyfWd
     // Calculate color distance
     float CalcDistance(float3 c0, float3 c1)
@@ -50,14 +50,14 @@ Shader "FullScreen/FS_SNNFilter"
     {
         float2 uv = fragCoord;
         
-        float3 c0 = CustomPassSampleCustomColor(uv);
+        float3 c0 = CustomPassLoadCameraColor(uv,0);
         
         float4 sum = float4(0.0f, 0.0f, 0.0f, 0.0f);
         
-        for (int i = 0; i <= _HalfWidth; ++ i)
+        for (int i = 0; i <= _SNNHalfWidth; ++ i)
         {
-            float3 c1 = CustomPassSampleCustomColor(uv + float2(+i, 0)).rgb;
-            float3 c2 = CustomPassSampleCustomColor(uv + float2(-i, 0)).rgb;
+            float3 c1 = CustomPassLoadCameraColor(uv + float2(+i, 0),0).rgb;
+            float3 c2 = CustomPassLoadCameraColor(uv + float2(-i, 0),0).rgb;
             
             float d1 = CalcDistance(c1, c0);
             float d2 = CalcDistance(c2, c0);
@@ -71,13 +71,13 @@ Shader "FullScreen/FS_SNNFilter"
             }
             sum.a += 1.0f;
         }
-        for (int j = 1; j <= _HalfWidth; ++ j)
+        for (int j = 1; j <= _SNNHalfWidth; ++ j)
         {
-            for (int i = -_HalfWidth; i <= _HalfWidth; ++ i)
+            for (int i = -_SNNHalfWidth; i <= _SNNHalfWidth; ++ i)
             {
                 // float3 c1 = SAMPLE_TEXTURE2D(_MainTex, sampler_MainTex, uv + float2(+i, +j) * _ScreenSize.zw).rgb;
-                float3 c1 = CustomPassSampleCustomColor(uv + float2(+i, +j)).rgb;
-                float3 c2 = CustomPassSampleCustomColor(uv + float2(-i, -j)).rgb;
+                float3 c1 = CustomPassLoadCameraColor(uv + float2(+i, +j),0).rgb;
+                float3 c2 = CustomPassLoadCameraColor(uv + float2(-i, -j),0).rgb;
                 
                 float d1 = CalcDistance(c1, c0);
                 float d2 = CalcDistance(c2, c0);
@@ -103,12 +103,12 @@ Shader "FullScreen/FS_SNNFilter"
         float4 color = float4(0.0, 0.0, 0.0, 0.0);
 
         // Load the camera color buffer at the mip 0 if we're not at the before rendering injection point
-        // if (_CustomPassInjectionPoint != CUSTOMPASSINJECTIONPOINT_BEFORE_RENDERING)
-        //     color = float4(CustomPassSampleCustomColor(varyings.positionCS.xy, 0), 1);
+        if (_CustomPassInjectionPoint != CUSTOMPASSINJECTIONPOINT_BEFORE_RENDERING)
+            color = float4(CustomPassLoadCameraColor(varyings.positionCS.xy, 0), 1);
 
         // Add your custom pass code here
         float3 SNNFilterResult = CalcSNN(varyings.positionCS.xy);
-        color.rgb = lerp(SNNFilterResult,color.rgb,_LerpBase);
+        color.rgb = lerp(color.rgb,SNNFilterResult,_SNNIntensity);
         // Fade value allow you to increase the strength of the effect while the camera gets closer to the custom pass volume
         float f = 1 - abs(_FadeValue * 2 - 1);
         return float4(color.rgb + f, color.a);

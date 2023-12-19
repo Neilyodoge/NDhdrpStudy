@@ -2,6 +2,9 @@ using UnityEngine;
 using UnityEngine.Rendering.HighDefinition;
 using UnityEngine.Rendering;
 using UnityEngine.Experimental.Rendering;
+using System.Runtime.CompilerServices;
+using System;
+using System.Diagnostics;
 
 //#if UNITY_EDITOR
 
@@ -65,8 +68,16 @@ using UnityEngine.Experimental.Rendering;
 //#endif
 class FS_SNNSharpen : CustomPass
 {
+#if UNITY_EDITOR
+    [SerializeField]
+    public int debug; 
+    // 0,null   1,SNN   2,Sharp
+#endif
     [SerializeField] public Material SNN_mat;
     [SerializeField] public Material Sharpen_mat;
+    [SerializeField] [Range(0f, 1f)] public float _SNNIntensity = 1f;
+    [SerializeField] [Range(1f, 20f)] public float _SNNHalfWidth = 5f;
+    [SerializeField] [Range(0f, 1f)] public float _SharpIntensity = 1f;
     RTHandle tempBuffer; // additional render target for compositing the custom and camera color buffers
 
     // It can be used to configure render targets and their clear state. Also to create temporary render target textures.
@@ -78,7 +89,7 @@ class FS_SNNSharpen : CustomPass
         // Setup code here
         tempBuffer = RTHandles.Alloc(Vector2.one, TextureXR.slices, dimension: TextureXR.dimension, colorFormat: GraphicsFormat.R16G16B16A16_SFloat, useDynamicScale: true, name: "Temp Buffer");
 
-        targetColorBuffer = TargetBuffer.Camera;
+        targetColorBuffer = TargetBuffer.Camera ;
         //targetDepthBuffer = TargetBuffer.Custom;
         //clearFlags = ClearFlag.All;
     }
@@ -88,13 +99,25 @@ class FS_SNNSharpen : CustomPass
         // Executed every frame for all the camera inside the pass volume.
         // The context contains the command buffer to use to enqueue graphics commands.
         //CoreUtils.SetRenderTarget(ctx.cmd, ctx.cameraColorBuffer);
-        //CoreUtils.DrawFullScreen(ctx.cmd, SNN_mat, 0, properties: ctx.propertyBlock);
-        ctx.cmd.Blit(ctx.cameraColorBuffer, ctx.cameraColorBuffer, SNN_mat,0);
-        //CoreUtils.SetRenderTarget(ctx.cmd, tempBuffer, ClearFlag.Color);
-        //ctx.propertyBlock.SetTexture("_SNNTex", tempBuffer);
-        //ctx.cmd.Blit(ctx.cameraColorBuffer, ctx.cameraColorBuffer, Sharpen_mat, 0);
-        ////ctx.propertyBlock.SetTexture("_TIPSBuffer", ctx.cameraColorBuffer);
-        //CoreUtils.DrawFullScreen(ctx.cmd, Sharpen_mat, 0, properties: ctx.propertyBlock);
+        //CoreUtils.DrawFullScreen(ctx.cmd, SNN_mat, ctx.cameraColorBuffer, properties: ctx.propertyBlock);
+
+        SNN_mat.SetFloat("_SNNIntensity", _SNNIntensity);
+        SNN_mat.SetFloat("_SNNHalfWidth", _SNNHalfWidth);
+        Sharpen_mat.SetFloat("_SharpIntensity", _SharpIntensity);
+#if UNITY_EDITOR
+        if (debug == 1)
+        {
+            CoreUtils.DrawFullScreen(ctx.cmd, SNN_mat, ctx.cameraColorBuffer, properties: ctx.propertyBlock);
+        }
+        else if(debug == 2)
+        {
+            Sharpen_mat.SetTexture("_AfterSNNTex", ctx.cameraColorBuffer);
+            CoreUtils.DrawFullScreen(ctx.cmd, Sharpen_mat, ctx.cameraColorBuffer, properties: ctx.propertyBlock);
+        }
+#endif
+        ctx.cmd.Blit(ctx.cameraColorBuffer, tempBuffer, SNN_mat, 0);
+        Sharpen_mat.SetTexture("_AfterSNNTex", tempBuffer);
+        CoreUtils.DrawFullScreen(ctx.cmd, Sharpen_mat, ctx.cameraColorBuffer, properties: ctx.propertyBlock);
     }
 
     protected override void Cleanup()
