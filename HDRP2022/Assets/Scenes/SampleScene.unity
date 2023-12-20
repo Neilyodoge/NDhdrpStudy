@@ -6894,7 +6894,6 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 529206547}
-  - component: {fileID: 529206546}
   - component: {fileID: 529206548}
   m_Layer: 0
   m_Name: CustomPass
@@ -6903,43 +6902,6 @@ GameObject:
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
   m_IsActive: 1
---- !u!114 &529206546
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 529206545}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 26d6499a6bd256e47b859377446493a1, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  m_IsGlobal: 1
-  fadeRadius: 0
-  priority: 10
-  customPasses:
-  - rid: 5453576854259367936
-  injectionPoint: 2
-  m_TargetCamera: {fileID: 0}
-  useTargetCamera: 0
-  references:
-    version: 2
-    RefIds:
-    - rid: 5453576854259367936
-      type: {class: FullScreenCustomPass, ns: UnityEngine.Rendering.HighDefinition, asm: Unity.RenderPipelines.HighDefinition.Runtime}
-      data:
-        m_Name: SNN
-        enabled: 1
-        targetColorBuffer: 0
-        targetDepthBuffer: 2
-        clearFlags: 0
-        passFoldout: 0
-        m_Version: 0
-        fullscreenPassMaterial: {fileID: 2100000, guid: d08027a504a4ead4cac99392eeb5c840, type: 2}
-        materialPassIndex: 0
-        materialPassName: Custom Pass 0
-        fetchColorBuffer: 0
 --- !u!4 &529206547
 Transform:
   m_ObjectHideFlags: 0
@@ -6969,29 +6931,50 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   m_IsGlobal: 1
   fadeRadius: 0
-  priority: 9
+  priority: 0
   customPasses:
-  - rid: 5453576854259367938
+  - rid: 5453577029532254208
+  - rid: 5453577039608807424
   injectionPoint: 2
   m_TargetCamera: {fileID: 0}
   useTargetCamera: 0
   references:
     version: 2
     RefIds:
-    - rid: 5453576854259367938
-      type: {class: FullScreenCustomPass, ns: UnityEngine.Rendering.HighDefinition, asm: Unity.RenderPipelines.HighDefinition.Runtime}
+    - rid: 5453577029532254208
+      type: {class: FS_SNNSharpen, ns: , asm: Assembly-CSharp}
       data:
-        m_Name: Sharpen
+        m_Name: Custom Pass
         enabled: 1
         targetColorBuffer: 0
-        targetDepthBuffer: 2
+        targetDepthBuffer: 0
         clearFlags: 0
         passFoldout: 0
         m_Version: 0
-        fullscreenPassMaterial: {fileID: 2100000, guid: 9af860466352945428fdeaba1b3ed61a, type: 2}
-        materialPassIndex: 0
-        materialPassName: Custom Pass 0
-        fetchColorBuffer: 0
+        SNN_mat: {fileID: 2100000, guid: d08027a504a4ead4cac99392eeb5c840, type: 2}
+        Sharpen_mat: {fileID: 2100000, guid: 9af860466352945428fdeaba1b3ed61a, type: 2}
+        _SNNIntensity: 1
+        _SNNHalfWidth: 5
+        _SharpIntensity: 1
+        debug: 1
+    - rid: 5453577039608807424
+      type: {class: SlightBlur, ns: , asm: Assembly-CSharp}
+      data:
+        m_Name: Custom Pass
+        enabled: 0
+        targetColorBuffer: 0
+        targetDepthBuffer: 0
+        clearFlags: 0
+        passFoldout: 0
+        m_Version: 0
+        radius: 4
+        useMask: 0
+        maskLayer:
+          serializedVersion: 2
+          m_Bits: 0
+        invertMask: 0
+        compositeShader: {fileID: 4800000, guid: d82546742f9c2b94d909ada774b0aa86, type: 3}
+        whiteRenderersShader: {fileID: 4800000, guid: 8386dcbf863f5f94ba335f17fdf15443, type: 3}
 --- !u!1001 &531975315
 PrefabInstance:
   m_ObjectHideFlags: 0

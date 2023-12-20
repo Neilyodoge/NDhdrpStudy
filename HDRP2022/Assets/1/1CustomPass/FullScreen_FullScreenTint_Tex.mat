@@ -7,8 +7,8 @@ Material:
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_Name: FullScreen_FS_SNNFilter
-  m_Shader: {fileID: 4800000, guid: f5f375609e39ac94690d7c64d884eca9, type: 3}
+  m_Name: FullScreen_FullScreenTint_Tex
+  m_Shader: {fileID: 4800000, guid: 00607291625d8d64ba632241dcbe8ec0, type: 3}
   m_Parent: {fileID: 0}
   m_ModifiedSerializedProperties: 0
   m_ValidKeywords: []
@@ -24,10 +24,7 @@ Material:
     serializedVersion: 3
     m_TexEnvs: []
     m_Ints: []
-    m_Floats:
-    - _HalfWidth: 5
-    - _LerpBase: 0
-    - _SNNHalfWidth: 5
-    - _SNNIntensity: 1
-    m_Colors: []
+    m_Floats: []
+    m_Colors:
+    - _Color: {r: 0.36470604, g: 1, b: 0, a: 1}
   m_BuildTextureStacks: []

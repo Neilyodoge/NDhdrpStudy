@@ -1,13 +1,9 @@
-Shader "FullScreen/FS_SharpenFilter"
+Shader "FullScreen/FS_SharpenFilter_ColorBf"
 {
-    Properties
-    {
-        _MainTex("MainTex",2D) = "gray"
-    }
     HLSLINCLUDE
 
     #pragma vertex Vert
- #pragma enable_d3d11_debug_symbols
+
     #pragma target 4.5
     #pragma only_renderers d3d11 playstation xboxone xboxseries vulkan metal switch
 
@@ -34,22 +30,16 @@ Shader "FullScreen/FS_SharpenFilter"
 
     // There are also a lot of utility function you can use inside Common.hlsl and Color.hlsl,
     // you can check them out in the source code of the core SRP package.
-    TEXTURE2D(_MainTex);
+
     float3 sharpenFilter(float2 fragCoord)
     {
-        float3 f =  SAMPLE_TEXTURE2D(_MainTex,s_linear_repeat_sampler,fragCoord + float2(0, -1)).rgb * -1. +
-                    SAMPLE_TEXTURE2D(_MainTex,s_linear_repeat_sampler,fragCoord + float2(-1, 0)).rgb * -1. +
-                    SAMPLE_TEXTURE2D(_MainTex,s_linear_repeat_sampler,fragCoord + float2(0, 0)).rgb  * 5.  +
-                    SAMPLE_TEXTURE2D(_MainTex,s_linear_repeat_sampler,fragCoord + float2(1, 0)).rgb * -1.  +
-                    SAMPLE_TEXTURE2D(_MainTex,s_linear_repeat_sampler,fragCoord + float2(0, 1)).rgb * -1.  ;
+        float3 f =  CustomPassLoadCameraColor(fragCoord + float2(0, -1),0).rgb * -1. +
+                    CustomPassLoadCameraColor(fragCoord + float2(-1, 0),0).rgb * -1. +
+                    CustomPassLoadCameraColor(fragCoord + float2(0, 0),0).rgb  * 5.  +
+                    CustomPassLoadCameraColor(fragCoord + float2(1, 0),0).rgb * -1.  +
+                    CustomPassLoadCameraColor(fragCoord + float2(0, 1),0).rgb * -1.  ;
 
         return f;
-    }
-
-    float2 ClampUVs(float2 uv)
-    {
-        uv = clamp(uv, 0, _RTHandleScale.xy - _ScreenSize.zw * 2); // clamp UV to 1 pixel to avoid bleeding
-        return uv;
     }
 
     float4 FullScreenPass(Varyings varyings) : SV_Target
@@ -60,15 +50,12 @@ Shader "FullScreen/FS_SharpenFilter"
         float3 viewDirection = GetWorldSpaceNormalizeViewDir(posInput.positionWS);
         float4 color = float4(0.0, 0.0, 0.0, 0.0);
 
-        float2 uv = ClampUVs(varyings.positionCS.xy * _ScreenSize.zw * _RTHandleScale.xy);
         // Load the camera color buffer at the mip 0 if we're not at the before rendering injection point
         if (_CustomPassInjectionPoint != CUSTOMPASSINJECTIONPOINT_BEFORE_RENDERING)
             color = float4(CustomPassLoadCameraColor(varyings.positionCS.xy, 0), 1);
 
         // Add your custom pass code here
-        //varyings.positionCS.y *= -1;
-        //color.rgb = sharpenFilter(varyings.positionCS.xy * _ScreenSize.zw * _RTHandleScale.xy);
-        color.rgb = SAMPLE_TEXTURE2D(_MainTex,s_linear_repeat_sampler,uv).rgb;
+        color.rgb = sharpenFilter(varyings.positionCS.xy);
         // Fade value allow you to increase the strength of the effect while the camera gets closer to the custom pass volume
         float f = 1 - abs(_FadeValue * 2 - 1);
         return float4(color.rgb + f, color.a);
