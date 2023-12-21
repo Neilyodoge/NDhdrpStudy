@@ -96,9 +96,9 @@ class FS_SNNSharpen : CustomPass
                     useDynamicScale: true, name: "tempBuffer"
                 );
         // tempBuffer = RTHandles.Alloc(Vector2.one, TextureXR.slices, dimension: TextureXR.dimension, colorFormat: GraphicsFormat.R16G16B16A16_SFloat, useDynamicScale: true, name: "Temp Buffer");
-        UnityEngine.Debug.Log("rtwidth"+tempBuffer.rt.width);
+        //UnityEngine.Debug.Log("rtwidth"+tempBuffer.rt.width);
         targetColorBuffer = TargetBuffer.Camera;
-        targetDepthBuffer = TargetBuffer.Camera;
+        targetDepthBuffer = TargetBuffer.None;
         clearFlags = ClearFlag.None;
     }
 

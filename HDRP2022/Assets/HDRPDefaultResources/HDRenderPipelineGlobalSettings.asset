@@ -64,7 +64,9 @@ MonoBehaviour:
   beforeTransparentCustomPostProcesses: []
   beforePostProcessCustomPostProcesses: []
   afterPostProcessBlursCustomPostProcesses: []
-  afterPostProcessCustomPostProcesses: []
+  afterPostProcessCustomPostProcesses:
+  - Sharpen, Assembly-CSharp, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null
+  - PP_SNN, Assembly-CSharp, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null
   beforeTAACustomPostProcesses: []
   lightLayerName0: Light LayerDefault
   lightLayerName1: InteriorOnly

@@ -223,10 +223,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 1d459f26c4e75e34f90b7d4e897e2c2b, type: 3}
   m_Name: PP_SNN
   m_EditorClassIdentifier: 
-  active: 0
+  active: 1
   _LerpBase:
     m_OverrideState: 1
-    m_Value: 0
+    m_Value: 0.15
   _HalfWidth:
     m_OverrideState: 1
     m_Value: 5
@@ -429,6 +429,7 @@ MonoBehaviour:
   - {fileID: -3315835157980468525}
   - {fileID: -2312926311300199218}
   - {fileID: -7130180299151610998}
+  - {fileID: 4918407087993117413}
 --- !u!114 &747098994415714109
 MonoBehaviour:
   m_ObjectHideFlags: 3
@@ -589,6 +590,22 @@ MonoBehaviour:
   screenFadeDistance:
     m_OverrideState: 1
     m_Value: 0.001
+--- !u!114 &4918407087993117413
+MonoBehaviour:
+  m_ObjectHideFlags: 3
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 3bd41a6cb40bc9d4ea97bc69db539251, type: 3}
+  m_Name: Sharpen
+  m_EditorClassIdentifier: 
+  active: 1
+  intensity:
+    m_OverrideState: 1
+    m_Value: 0.197
 --- !u!114 &6640133647794636954
 MonoBehaviour:
   m_ObjectHideFlags: 3
