@@ -146,6 +146,19 @@ MonoBehaviour:
   m_DenoiserRadius:
     m_OverrideState: 1
     m_Value: 0.65
+--- !u!114 &-5300456059086136832
+MonoBehaviour:
+  m_ObjectHideFlags: 3
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: dcf676af8a2c8284a9cb12b4b34ede74, type: 3}
+  m_Name: ColorGrade
+  m_EditorClassIdentifier: 
+  active: 0
 --- !u!114 &-3969488579639410846
 MonoBehaviour:
   m_ObjectHideFlags: 3
@@ -226,7 +239,7 @@ MonoBehaviour:
   active: 1
   _LerpBase:
     m_OverrideState: 1
-    m_Value: 0.15
+    m_Value: 0.115
   _HalfWidth:
     m_OverrideState: 1
     m_Value: 5
@@ -430,6 +443,7 @@ MonoBehaviour:
   - {fileID: -2312926311300199218}
   - {fileID: -7130180299151610998}
   - {fileID: 4918407087993117413}
+  - {fileID: -5300456059086136832}
 --- !u!114 &747098994415714109
 MonoBehaviour:
   m_ObjectHideFlags: 3
@@ -605,7 +619,7 @@ MonoBehaviour:
   active: 1
   intensity:
     m_OverrideState: 1
-    m_Value: 0.197
+    m_Value: 0.185
 --- !u!114 &6640133647794636954
 MonoBehaviour:
   m_ObjectHideFlags: 3

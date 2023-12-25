@@ -19,7 +19,7 @@ public sealed class PP_SNN : CustomPostProcessVolumeComponent, IPostProcessCompo
     public bool IsActive() => snn_Material != null;
 
     // Do not forget to add this post process in the Custom Post Process Orders list (Project Settings > Graphics > HDRP Global Settings).
-    public override CustomPostProcessInjectionPoint injectionPoint => CustomPostProcessInjectionPoint.AfterPostProcess;
+    public override CustomPostProcessInjectionPoint injectionPoint => CustomPostProcessInjectionPoint.BeforePostProcess;
 
     const string snnShaderName = "Hidden/Shader/PP_SNN";
     const string sharpShaderName = "Hidden/Shader/PP_Sharpen";
