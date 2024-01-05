@@ -61,13 +61,14 @@ Shader "Hidden/Shader/PP_Sharpen"
         UNITY_SETUP_STEREO_EYE_INDEX_POST_VERTEX(input);
 
         // Note that if HDUtils.DrawFullScreen is not used to render the post process, you don't need to call ClampAndScaleUVForBilinearPostProcessTexture.
+        float3 color = 1;
 
         float3 sourceColor = SAMPLE_TEXTURE2D_X(_MainTex, s_linear_clamp_sampler, ClampAndScaleUVForBilinearPostProcessTexture(input.texcoord.xy)).xyz;
 
         float3 SharpenFilterResult = lerp(sharpenFilter(ClampAndScaleUVForBilinearPostProcessTexture(input.texcoord.xy)),color.rgb,_Intensity);
 
         // Apply greyscale effect
-        float3 color = lerp(sourceColor, SharpenFilterResult, _Intensity);
+        color = sourceColor;//lerp(sourceColor, SharpenFilterResult, _Intensity);
 
         return float4(color, 1);
     }

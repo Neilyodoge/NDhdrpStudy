@@ -2,6 +2,7 @@ using UnityEngine;
 using UnityEngine.Rendering;
 using UnityEngine.Rendering.HighDefinition;
 using System;
+using UnityEngine.Experimental.Rendering;
 
 [Serializable, VolumeComponentMenu("Post-processing/Custom/PP_SNN")]
 public sealed class PP_SNN : CustomPostProcessVolumeComponent, IPostProcessComponent
@@ -14,7 +15,7 @@ public sealed class PP_SNN : CustomPostProcessVolumeComponent, IPostProcessCompo
     Material snn_Material;
     Material sharp_Material;
 
-    RenderTargetIdentifier temp;
+    RTHandle temp;
 
     public bool IsActive() => snn_Material != null;
 
@@ -28,29 +29,42 @@ public sealed class PP_SNN : CustomPostProcessVolumeComponent, IPostProcessCompo
     {
         if (Shader.Find(snnShaderName) != null)
             snn_Material = new Material(Shader.Find(snnShaderName));
-        else if(Shader.Find(sharpShaderName) != null)
-            sharp_Material = new Material(Shader.Find(snnShaderName));
-        else
-            Debug.LogError($"Unable to find shader '{snnShaderName}' or '{sharpShaderName}'. Post Process Volume PP_SNN is unable to load.");
+        if(Shader.Find(sharpShaderName) != null)
+            sharp_Material = new Material(Shader.Find(sharpShaderName));
+        
+        //else
+        //    Debug.LogError($"Unable to find shader '{snnShaderName}' or '{sharpShaderName}'. Post Process Volume PP_SNN is unable to load.");
+
     }
 
     public override void Render(CommandBuffer cmd, HDCamera camera, RTHandle source, RTHandle destination)
     {
-        if (snn_Material == null && sharp_Material == null)
+        if (snn_Material == null || sharp_Material == null)
             return;
+
+        if (temp?.rt == null || !temp.rt.IsCreated())
+        {
+            temp = RTHandles.Alloc(
+            Vector2.one, TextureXR.slices, dimension: TextureXR.dimension,
+            colorFormat: GraphicsFormat.B10G11R11_UFloatPack32, // We don't need alpha in the blur
+            useDynamicScale: true, name: "BlurBuffer");
+        }
 
         snn_Material.SetFloat("_LerpBase", _LerpBase.value);
         snn_Material.SetFloat("_HalfWidth", _HalfWidth.value);
         snn_Material.SetTexture("_MainTex", source);
-        HDUtils.DrawFullScreen(cmd, snn_Material, destination, shaderPassId: 0);
-        //sharp_Material.SetTexture("_MainTex", destination);
-        //sharp_Material.SetFloat("_Intensity", _Intensity.value);
-        //HDUtils.DrawFullScreen(cmd, sharp_Material, destination, shaderPassId: 0);
+        HDUtils.DrawFullScreen(cmd, snn_Material, temp, shaderPassId: 0);
+
+        sharp_Material.SetTexture("_MainTex", temp);
+        sharp_Material.SetFloat("_Intensity", _Intensity.value);
+        HDUtils.DrawFullScreen(cmd, sharp_Material, destination, shaderPassId: 0);
     }
 
     public override void Cleanup()
     {
         CoreUtils.Destroy(snn_Material);
         CoreUtils.Destroy(sharp_Material);
+
+        temp?.Release();
     }
 }
